@@ -18,6 +18,8 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import lombok.Getter;
+
 /**
  * CoronaVirusDataService
  */
@@ -26,6 +28,7 @@ public class CoronaVirusDataService {
 
     private static String VIRUS_DATA_URL = "https://raw.githubusercontent.com/siucng2222-c/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
 
+    @Getter
     private List<LocationStats> cachedStats = new ArrayList<>();
 
     // Execute this method after Spring app started and service bean
