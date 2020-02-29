@@ -35,6 +35,8 @@ public class HomeController {
         // and sum them up
         int totalCases = locationStats.stream().mapToInt(stat -> stat.getLatestTotalCases()).sum();
         // Sort list by locationStat objects' LatestTotalCases attribute in desc order
+        // https://mkyong.com/java8/java-8-how-to-sort-list-with-stream-sorted/
+        // https://stackoverflow.com/questions/32995559/reverse-a-comparator-in-java-8
         locationStats = locationStats.stream()
                 .sorted(Comparator.comparingInt(LocationStats::getLatestTotalCases).reversed())
                 .collect(Collectors.toList());

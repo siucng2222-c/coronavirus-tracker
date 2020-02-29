@@ -34,9 +34,10 @@ public class CoronaVirusDataService {
     // Execute this method after Spring app started and service bean
     // constructed
     @PostConstruct
-    // Apply a scheduled re-fetch every 1 clock hr (sec min hr day wk mth)
+    // Scheduled re-fetch every 20th clock min (00, 20, 40) (sec min hr day wk mth)
+    // https://crontab.guru/
     // REMEMBER to EnableScheduling in main class
-    @Scheduled(cron = "0 0 */1 * * *")
+    @Scheduled(cron = "0 */20 * * * *")
     public void fetchVirusData() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VIRUS_DATA_URL)).build();
