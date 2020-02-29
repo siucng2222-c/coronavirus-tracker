@@ -1,5 +1,8 @@
 package com.scallionlead.coronavirustracker.controllers;
 
+import java.util.List;
+
+import com.scallionlead.coronavirustracker.models.LocationStats;
 import com.scallionlead.coronavirustracker.services.CoronaVirusDataService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +26,16 @@ public class HomeController {
     public String home(Model model) {
         // Correspond to resources/template/home.html
         // which is a Thymeleaf template
+
+        List<LocationStats> locationStats = coronaVirusDataService.getCachedStats();
+
+        // Iterate each locationStat object in the list, get latestTotalCases attribute
+        // and sum them up
+        int totalCases = locationStats.stream().mapToInt(stat -> stat.getLatestTotalCases()).sum();
+
         model.addAttribute("testName", "Hello World!");
-        model.addAttribute("locationStats", coronaVirusDataService.getCachedStats());
+        model.addAttribute("locationStats", locationStats);
+        model.addAttribute("totalCases", totalCases);
         return "home";
     }
 

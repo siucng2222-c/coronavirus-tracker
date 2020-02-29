@@ -4,22 +4,54 @@
   <head>
     <title>Corona Virus Tracker</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
   </head>
 
   <body>
-    <h1>Corona Virus Tracker</h1>
-    <p th:text="${testName}">Default String here?</p>
-    <table>
-      <tr>
-        <th>Province/State</th>
-        <th>Country/Region</th>
-        <th>Latest Total Cases</th>
-      </tr>
-      <tr th:each="stat : ${locationStats}">
-        <td th:text="${stat.provinceState}"></td>
-        <td th:text="${stat.countryRegion}"></td>
-        <td th:text="${stat.latestTotalCases}"></td>
-      </tr>
-    </table>
+    <div class="container">
+      <h1>Corona Virus Tracker</h1>
+      <div class="jumbotron">
+        <h1 class="display-4" th:text="${totalCases}"></h1>
+        <p class="lead">
+          Total cases as of today
+        </p>
+        <hr class="my-4" />
+        <p>
+          The list below illustrates the latest number of Coronavirus (COVID-19)
+          cases reported globally
+        </p>
+        <p>
+          Credit to Java Brains, Data source provided by the Johns Hopkins
+          University Center for Systems Science and Engineering (JHU CCSE)
+        </p>
+        <a
+          class="btn btn-primary btn-lg"
+          href="https://www.youtube.com/watch?v=8hjNG9GZGnQ&t=1s"
+          role="button"
+          target="new"
+          >Learn more</a
+        >
+      </div>
+      <!-- <h1>Corona Virus Tracker</h1>
+    <p> The list below illustrates the latest number of Corona Virus cases reported globally</p>
+    <p th:text="${testName}">Default String here?</p> -->
+      <table>
+        <tr>
+          <th>Province/State</th>
+          <th>Country/Region</th>
+          <th>Latest Total Cases</th>
+        </tr>
+        <tr th:each="stat : ${locationStats}">
+          <td th:text="${stat.provinceState}"></td>
+          <td th:text="${stat.countryRegion}"></td>
+          <td th:text="${stat.latestTotalCases}"></td>
+        </tr>
+      </table>
+    </div>
   </body>
 </html>
