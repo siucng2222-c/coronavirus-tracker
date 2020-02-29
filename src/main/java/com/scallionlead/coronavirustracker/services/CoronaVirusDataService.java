@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,16 +25,20 @@ public class CoronaVirusDataService {
 
     private static String VIRUS_DATA_URL = "https://raw.githubusercontent.com/siucng2222-c/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
 
-    // Execute this method after Spring app started and bean service bean
+    // Execute this method after Spring app started and service bean
     // constructed
     @PostConstruct
+    // Apply a scheduled re-fetch every 1 clock min (sec min hr day wk mth)
+    // REMEMBER to EnableScheduling in main class
+    @Scheduled(cron = "0 */1 * * * *")
     public void fetchVirusData() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VIRUS_DATA_URL)).build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body());
-        StringReader csvStringReader = new StringReader(response.body());
+        String responseStr = response.body();
+        // System.out.println(responseStr);
+        StringReader csvStringReader = new StringReader(responseStr);
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvStringReader);
         for (CSVRecord record : records) {
             String provinceState = record.get("Province/State");
