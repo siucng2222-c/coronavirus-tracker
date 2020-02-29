@@ -1,13 +1,19 @@
 package com.scallionlead.coronavirustracker.services;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,6 +32,14 @@ public class CoronaVirusDataService {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VIRUS_DATA_URL)).build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        // System.out.println(response.body());
+        StringReader csvStringReader = new StringReader(response.body());
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvStringReader);
+        for (CSVRecord record : records) {
+            String provinceState = record.get("Province/State");
+            String countryRegion = record.get("Country/Region");
+            String lat = record.get("Lat");
+            System.out.printf(Locale.getDefault(), "[%s,%s,%s] \n", provinceState, countryRegion, lat);
+        }
     }
 }
