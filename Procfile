@@ -1,0 +1,1 @@
+web: ./mvnv spring-boot:run
