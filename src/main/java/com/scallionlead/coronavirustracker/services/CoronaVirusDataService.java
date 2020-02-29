@@ -34,9 +34,9 @@ public class CoronaVirusDataService {
     // Execute this method after Spring app started and service bean
     // constructed
     @PostConstruct
-    // Apply a scheduled re-fetch every 1 clock min (sec min hr day wk mth)
+    // Apply a scheduled re-fetch every 1 clock hr (sec min hr day wk mth)
     // REMEMBER to EnableScheduling in main class
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 0 */1 * * *")
     public void fetchVirusData() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(VIRUS_DATA_URL)).build();
@@ -59,9 +59,20 @@ public class CoronaVirusDataService {
             stats.setProvinceState(record.get(LocationStats.PROVINCE_STATE_FIELD));
             stats.setCountryRegion(record.get(LocationStats.COUNTRY_REGION_FIELD));
 
-            // Get the latest stat from last column
-            stats.setLatestTotalCases(Integer.parseInt(record.get(record.size() - 1)));
-            System.out.println(stats);
+            try {
+                // Get the latest stat from last column
+                int latestCases = Integer.parseInt(record.get(record.size() - 1));
+                stats.setLatestTotalCases(latestCases);
+
+                int prevDayCases = Integer.parseInt(record.get(record.size() - 2));
+                stats.setDiffFromPrevDay(latestCases - prevDayCases);
+
+            } catch (Exception e) {
+                // TODO: handle exception
+                e.printStackTrace();
+            }
+            // System.out.println(stats);
+
             newStats.add(stats);
         }
 

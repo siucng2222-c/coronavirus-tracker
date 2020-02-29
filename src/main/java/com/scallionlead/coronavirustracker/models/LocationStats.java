@@ -21,5 +21,6 @@ public class LocationStats {
     private String provinceState;
     private String countryRegion;
     private int latestTotalCases;
+    private int diffFromPrevDay;
 
 }

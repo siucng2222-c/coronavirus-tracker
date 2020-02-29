@@ -16,9 +16,13 @@
     <div class="container">
       <h1>Corona Virus Tracker</h1>
       <div class="jumbotron">
-        <h1 class="display-4" th:text="${totalCases}"></h1>
         <p class="lead">
           Total cases as of today
+        </p>
+        <h1 class="display-4" th:text="${totalCases}"></h1>
+        <p>
+          New cases reported since yesterday =
+          <strong><span th:text="${totalNewCases}"></span></strong>
         </p>
         <hr class="my-4" />
         <p>
@@ -40,16 +44,18 @@
       <!-- <h1>Corona Virus Tracker</h1>
     <p> The list below illustrates the latest number of Corona Virus cases reported globally</p>
     <p th:text="${testName}">Default String here?</p> -->
-      <table>
+      <table class="table">
         <tr>
           <th>Province/State</th>
           <th>Country/Region</th>
           <th>Latest Total Cases</th>
+          <th>Delta from Previous Day</th>
         </tr>
         <tr th:each="stat : ${locationStats}">
           <td th:text="${stat.provinceState}"></td>
           <td th:text="${stat.countryRegion}"></td>
           <td th:text="${stat.latestTotalCases}"></td>
+          <td th:text="${stat.diffFromPrevDay}"></td>
         </tr>
       </table>
     </div>

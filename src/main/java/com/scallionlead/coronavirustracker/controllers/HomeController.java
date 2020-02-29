@@ -1,6 +1,8 @@
 package com.scallionlead.coronavirustracker.controllers;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.scallionlead.coronavirustracker.models.LocationStats;
 import com.scallionlead.coronavirustracker.services.CoronaVirusDataService;
@@ -32,10 +34,15 @@ public class HomeController {
         // Iterate each locationStat object in the list, get latestTotalCases attribute
         // and sum them up
         int totalCases = locationStats.stream().mapToInt(stat -> stat.getLatestTotalCases()).sum();
-
+        // Sort list by locationStat objects' LatestTotalCases attribute in desc order
+        locationStats = locationStats.stream()
+                .sorted(Comparator.comparingInt(LocationStats::getLatestTotalCases).reversed())
+                .collect(Collectors.toList());
+        int totalNewCases = locationStats.stream().mapToInt(stat -> stat.getDiffFromPrevDay()).sum();
         model.addAttribute("testName", "Hello World!");
         model.addAttribute("locationStats", locationStats);
         model.addAttribute("totalCases", totalCases);
+        model.addAttribute("totalNewCases", totalNewCases);
         return "home";
     }
 
