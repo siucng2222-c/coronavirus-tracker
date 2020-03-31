@@ -4,6 +4,7 @@
   <head>
     <title>Corona Virus Tracker</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -13,6 +14,12 @@
     <link
       rel="stylesheet"
       href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.css"
+      integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E="
+      crossorigin="anonymous"
     />
     <script
       src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -30,6 +37,11 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"
+      integrity="sha256-TQq84xX6vkwR0Qs1qH5ADkP+MvH0W+9E7TdHJsoIQiM="
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
@@ -64,6 +76,7 @@
       <!-- <h1>Corona Virus Tracker</h1>
     <p> The list below illustrates the latest number of Corona Virus cases reported globally</p>
     <p th:text="${testName}">Default String here?</p> -->
+      <canvas id="canvas"></canvas>
       <table class="table" id="myTable">
         <thead>
           <tr>
@@ -84,9 +97,132 @@
       </table>
     </div>
   </body>
-  <script>
+  <script th:inline="javascript">
+    // Thymeleaf Javascript Inline Example with Variable
+    // https://www.concretepage.com/thymeleaf/thymeleaf-javascript-inline-example-with-variable
     $(document).ready(function() {
       $("#myTable").DataTable();
+      /*<![CDATA[*/
+
+      var locationStats = /*[[${locationStats}]]*/ null;
+      var countryStat = /*[[${countryStat}]]*/ null;
+      var headers = /*[[${headers}]]*/ null;
+      console.log(locationStats);
+      console.log(countryStat);
+      console.log(headers);
+
+      /*]]>*/
+
+      if (headers) {
+        var config = {
+          type: "line",
+          data: {
+            labels: headers,
+            datasets: []
+          },
+          options: {
+            legend: {
+              display: false
+            },
+            responsive: true,
+            title: {
+              display: true,
+              text: "Global COVID-19 Cases Chart"
+            },
+            tooltips: {
+              mode: "index",
+              intersect: false
+            },
+            hover: {
+              mode: "nearest",
+              intersect: true
+              // animationDuration: 0
+            },
+            // animation: {
+            //   duration: 0
+            // },
+            // responsiveAnimationDuration: 0,
+            scales: {
+              xAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Dates"
+                  }
+                }
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Cases"
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        window.chartColors = {
+          red: "rgb(255, 99, 132)",
+          orange: "rgb(255, 159, 64)",
+          yellow: "rgb(255, 205, 86)",
+          green: "rgb(75, 192, 192)",
+          blue: "rgb(54, 162, 235)",
+          purple: "rgb(153, 102, 255)",
+          grey: "rgb(201, 203, 207)"
+        };
+
+        var colorNames = Object.keys(window.chartColors);
+        console.log(colorNames);
+        // if (locationStats) {
+        //   locationStats.forEach(stat => {
+        //     // console.log(stat);
+        //     // var stat = locationStats[0];
+        //     var colorName =
+        //       colorNames[config.data.datasets.length % colorNames.length];
+        //     console.log(colorName);
+        //     var newColor = window.chartColors[colorName];
+        //     console.log(newColor);
+        //     var newDataset = {
+        //       label: stat.countryRegion + "_" + stat.provinceState,
+        //       backgroundColor: newColor,
+        //       borderColor: newColor,
+        //       data: stat.allData,
+        //       fill: false
+        //     };
+        //     console.log(newDataset);
+        //     config.data.datasets.push(newDataset);
+        //   });
+        // }
+
+        if (countryStat) {
+          var countries = Object.keys(countryStat);
+          countries.forEach(country => {
+            var colorName =
+              colorNames[config.data.datasets.length % colorNames.length];
+
+            var newColor = window.chartColors[colorName];
+
+            var newDataset = {
+              label: country,
+              backgroundColor: newColor,
+              borderColor: newColor,
+              data: countryStat[country],
+              fill: false
+            };
+
+            config.data.datasets.push(newDataset);
+          });
+        }
+
+        console.log(config);
+
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx, config);
+      }
     });
   </script>
 </html>

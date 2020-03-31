@@ -1,5 +1,7 @@
 package com.scallionlead.coronavirustracker.models;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,5 +24,6 @@ public class LocationStats {
     private String countryRegion;
     private int latestTotalCases;
     private int diffFromPrevDay;
+    private List<Integer> allData;
 
 }

@@ -7,13 +7,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import com.scallionlead.coronavirustracker.models.LocationStats;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,12 @@ public class CoronaVirusDataService {
     @Getter
     private List<LocationStats> cachedStats = new ArrayList<>();
 
+    @Getter
+    private List<String> headers = new ArrayList<>();
+
+    @Getter
+    private Map<String, List<Integer>> countryStat = new HashMap<>();
+
     // Execute this method after Spring app started and service bean
     // constructed
     @PostConstruct
@@ -50,14 +59,23 @@ public class CoronaVirusDataService {
         StringReader csvStringReader = new StringReader(responseStr);
 
         List<LocationStats> newStats = new ArrayList<>();
-        Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvStringReader);
+
+        CSVParser parsedCSV = new CSVParser(csvStringReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+
+        // Dates headers start from the 5th column
+        this.headers = parsedCSV.getHeaderNames();
+        this.headers = this.headers.subList(4, this.headers.size());
+
+        // Iterable<CSVRecord> records =
+        // CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvStringReader);
+
+        Iterable<CSVRecord> records = parsedCSV.getRecords();
         for (CSVRecord record : records) {
             // String provinceState = record.get("Province/State");
             // String countryRegion = record.get("Country/Region");
             // String lat = record.get("Lat");
             // System.out.printf(Locale.getDefault(), "[%s,%s,%s] \n", provinceState,
             // countryRegion, lat);
-
             LocationStats stats = new LocationStats();
             stats.setProvinceState(record.get(LocationStats.PROVINCE_STATE_FIELD));
             stats.setCountryRegion(record.get(LocationStats.COUNTRY_REGION_FIELD));
@@ -70,6 +88,26 @@ public class CoronaVirusDataService {
                 int prevDayCases = Integer.parseInt(record.get(record.size() - 2));
                 stats.setDiffFromPrevDay(latestCases - prevDayCases);
 
+                // Extract all cases numbers under date columns
+                List<Integer> allData = new ArrayList<>();
+                for (int i = 4; i < record.size(); i++) {
+                    allData.add(Integer.parseInt(record.get(i)));
+                }
+                stats.setAllData(allData);
+
+                // Consolidate "per country" data
+                if (this.countryStat.containsKey(stats.getCountryRegion())) {
+                    List<Integer> countryData = this.countryStat.get(stats.getCountryRegion());
+                    for (int i = 0; i < countryData.size(); i++) {
+                        Integer newData = allData.get(i) + countryData.get(i);
+                        countryData.set(i, newData);
+                    }
+
+                    countryStat.put(stats.getCountryRegion(), countryData);
+                } else {
+                    this.countryStat.put(stats.getCountryRegion(), allData);
+                }
+
             } catch (Exception e) {
                 // TODO: handle exception
                 e.printStackTrace();
@@ -78,6 +116,8 @@ public class CoronaVirusDataService {
 
             newStats.add(stats);
         }
+
+        parsedCSV.close();
 
         this.cachedStats = newStats;
     }
