@@ -107,9 +107,9 @@
       var locationStats = /*[[${locationStats}]]*/ null;
       var countryStat = /*[[${countryStat}]]*/ null;
       var headers = /*[[${headers}]]*/ null;
-      console.log(locationStats);
-      console.log(countryStat);
-      console.log(headers);
+      // console.log(locationStats);
+      // console.log(countryStat);
+      // console.log(headers);
 
       /*]]>*/
 
@@ -127,11 +127,12 @@
             responsive: true,
             title: {
               display: true,
-              text: "Global COVID-19 Cases Chart"
+              text: "Global COVID-19 Cases Chart (Top-20 Countries)"
             },
             tooltips: {
               mode: "index",
-              intersect: false
+              intersect: true,
+              position: "nearest"
             },
             hover: {
               mode: "nearest",
@@ -176,7 +177,7 @@
         };
 
         var colorNames = Object.keys(window.chartColors);
-        console.log(colorNames);
+
         // if (locationStats) {
         //   locationStats.forEach(stat => {
         //     // console.log(stat);
@@ -198,9 +199,11 @@
         //   });
         // }
 
-        if (countryStat) {
+        if (countryStat && locationStats) {
           var countries = Object.keys(countryStat);
-          countries.forEach(country => {
+          // countries.forEach(country => {
+          for (var i = 0; i < 20; i++) {
+            var country = locationStats[i].countryRegion;
             var colorName =
               colorNames[config.data.datasets.length % colorNames.length];
 
@@ -215,7 +218,8 @@
             };
 
             config.data.datasets.push(newDataset);
-          });
+          }
+          // });
         }
 
         console.log(config);
