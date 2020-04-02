@@ -6,6 +6,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +44,9 @@ public class CoronaVirusDataService {
 
     @Getter
     private Map<String, List<Integer>> countryStat = new HashMap<>();
+
+    @Getter
+    private String lastUpdateDt = "";
 
     // Execute this method after Spring app started and service bean
     // constructed
@@ -119,6 +125,8 @@ public class CoronaVirusDataService {
 
         parsedCSV.close();
 
+        this.lastUpdateDt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm zzz").withZone(ZoneId.of("Etc/UTC"))
+                .format(Instant.now());
         this.cachedStats = newStats;
     }
 }
