@@ -6,8 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,8 +124,15 @@ public class CoronaVirusDataService {
 
         parsedCSV.close();
 
-        this.lastUpdateDt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm zzz").withZone(ZoneId.of("Etc/UTC"))
-                .format(Instant.now());
+        // this.lastUpdateDt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm
+        // zzz").withZone(ZoneId.of("Etc/UTC"))
+        // .format(Instant.now());
+        // this.lastUpdateDt = this.headers.get(this.headers.size() - 1);
+
+        DateTimeFormatter srcFormatter = DateTimeFormatter.ofPattern("M/d/yy");
+        LocalDate date = LocalDate.parse(this.headers.get(this.headers.size() - 1), srcFormatter);
+
+        this.lastUpdateDt = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date);
         this.cachedStats = newStats;
     }
 }
