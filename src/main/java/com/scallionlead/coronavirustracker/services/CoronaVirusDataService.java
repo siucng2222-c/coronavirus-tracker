@@ -63,13 +63,16 @@ public class CoronaVirusDataService {
         // System.out.println(responseStr);
         StringReader csvStringReader = new StringReader(responseStr);
 
+        // reset local copy of stats upon schedule run
         List<LocationStats> newStats = new ArrayList<>();
+        Map<String, List<Integer>> newCountryStat = new HashMap<>();
+        List<String> newHeaders = new ArrayList<>();
 
         CSVParser parsedCSV = new CSVParser(csvStringReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
 
         // Dates headers start from the 5th column
-        this.headers = parsedCSV.getHeaderNames();
-        this.headers = this.headers.subList(4, this.headers.size());
+        newHeaders = parsedCSV.getHeaderNames();
+        newHeaders = newHeaders.subList(4, newHeaders.size());
 
         // Iterable<CSVRecord> records =
         // CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvStringReader);
@@ -101,16 +104,16 @@ public class CoronaVirusDataService {
                 stats.setAllData(allData);
 
                 // Consolidate "per country" data
-                if (this.countryStat.containsKey(stats.getCountryRegion())) {
-                    List<Integer> countryData = this.countryStat.get(stats.getCountryRegion());
+                if (newCountryStat.containsKey(stats.getCountryRegion())) {
+                    List<Integer> countryData = newCountryStat.get(stats.getCountryRegion());
                     for (int i = 0; i < countryData.size(); i++) {
                         Integer newData = allData.get(i) + countryData.get(i);
                         countryData.set(i, newData);
                     }
 
-                    countryStat.put(stats.getCountryRegion(), countryData);
+                    newCountryStat.put(stats.getCountryRegion(), countryData);
                 } else {
-                    this.countryStat.put(stats.getCountryRegion(), allData);
+                    newCountryStat.put(stats.getCountryRegion(), allData);
                 }
 
             } catch (Exception e) {
@@ -130,9 +133,12 @@ public class CoronaVirusDataService {
         // this.lastUpdateDt = this.headers.get(this.headers.size() - 1);
 
         DateTimeFormatter srcFormatter = DateTimeFormatter.ofPattern("M/d/yy");
-        LocalDate date = LocalDate.parse(this.headers.get(this.headers.size() - 1), srcFormatter);
+        LocalDate date = LocalDate.parse(newHeaders.get(newHeaders.size() - 1), srcFormatter);
 
+        // Update cached values
         this.lastUpdateDt = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date);
         this.cachedStats = newStats;
+        this.countryStat = newCountryStat;
+        this.headers = newHeaders;
     }
 }

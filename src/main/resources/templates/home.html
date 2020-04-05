@@ -204,32 +204,26 @@
 
         var colorNames = Object.keys(window.chartColors);
 
-        // if (locationStats) {
-        //   locationStats.forEach(stat => {
-        //     // console.log(stat);
-        //     // var stat = locationStats[0];
-        //     var colorName =
-        //       colorNames[config.data.datasets.length % colorNames.length];
-        //     console.log(colorName);
-        //     var newColor = window.chartColors[colorName];
-        //     console.log(newColor);
-        //     var newDataset = {
-        //       label: stat.countryRegion + "_" + stat.provinceState,
-        //       backgroundColor: newColor,
-        //       borderColor: newColor,
-        //       data: stat.allData,
-        //       fill: false
-        //     };
-        //     console.log(newDataset);
-        //     config.data.datasets.push(newDataset);
-        //   });
-        // }
+        // console.log(countryStat);
+        if (countryStat) {
+          // https://stackoverflow.com/a/1069840
+          // Convert map to array of Arrays
+          var sortable = [];
+          for (var countryName in countryStat) {
+            // e.g. countryStat = {"country_name": Array_of_stats }
+            // below covert countryStat to 2d-array
+            // sortable[i][0] = "country_name"
+            // sortable[i][1] = Array_of_stats
+            sortable.push([countryName, countryStat[countryName]]);
+          }
+          sortable.sort(function(a, b) {
+            //sort by latest value in desc order
+            return b[1][b[1].length - 1] - a[1][a[1].length - 1];
+          });
 
-        if (countryStat && locationStats) {
-          var countries = Object.keys(countryStat);
-          // countries.forEach(country => {
           for (var i = 0; i < 20; i++) {
-            var country = locationStats[i].countryRegion;
+            // console.log(sortable[i]);
+            var country = sortable[i][0];
             var colorName =
               colorNames[config.data.datasets.length % colorNames.length];
 
@@ -239,16 +233,13 @@
               label: country,
               backgroundColor: newColor,
               borderColor: newColor,
-              data: countryStat[country],
+              data: sortable[i][1],
               fill: false
             };
 
             config.data.datasets.push(newDataset);
           }
-          // });
         }
-
-        // console.log(config);
 
         var ctx = document.getElementById("canvas").getContext("2d");
         window.myLine = new Chart(ctx, config);
